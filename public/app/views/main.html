@@ -1,16 +1,20 @@
 <div class="row search">
   <div class="col-md-4">
-    <form class="form-inline" role="form">
+    <form class="form-inline" name="searchForm" role="form"  ng-submit="searchPlayer(playerName)" novalidate>
+      <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
         <label class="sr-only" for="">Enter search terms</label>
-        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name">
+        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^[^0-9]+$/">
       </div>
-      <button type="submit" id="s" class="btn btn-default" ng-click="searchPlayer(playerName)">
+      <button type="submit" id="s" class="btn btn-default" ng-disabled="!searchForm.$valid || isProcessing" >
         <span class="glyphicon glyphicon-search"></span>
       </button>
     </form>
   </div>
   <div class="col-md-8">
+    <div ng-show="isProcessing" id="load"></div>  
     {{playerStat}}
   </div>
 </div>
+
+<!-- ng-click="searchPlayer(playerName)" -->
