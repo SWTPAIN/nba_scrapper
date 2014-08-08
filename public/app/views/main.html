@@ -3,13 +3,14 @@
     <form class="form-inline" role="form">
       <div class="form-group">
         <label class="sr-only" for="">Enter search terms</label>
-        <input type="search" class="form-control" name="player_name" placeholder="Enter NBA player name">
+        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name">
       </div>
-      <button type="submit" id="s" class="btn btn-default">
+      <button type="submit" id="s" class="btn btn-default" ng-click="searchPlayer(playerName)">
         <span class="glyphicon glyphicon-search"></span>
       </button>
     </form>
   </div>
   <div class="col-md-8">
+    {{playerStat}}
   </div>
 </div>

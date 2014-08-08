@@ -4,6 +4,7 @@ GEM
     coderay (1.0.9)
     daemons (1.1.9)
     eventmachine (1.0.0)
+    json (1.8.1)
     method_source (0.8.1)
     mini_portile (0.6.0)
     nokogiri (1.6.3.1)
@@ -32,6 +33,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  json
   nokogiri
   pry
   shotgun
