@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>NBA Scraper</title>
+    <link href="/app/css/style.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  </head>
+  <body ng-app="NbaScraper">
+    <div class="header">
+      <h1 class="header-title">NBA Scraper</h1>
+      <p class="header-desctiption">Simple app to scrap NBA data</p>
+    </div>
+    <div ng-view></div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js"></script>
+    <script src="/app/app.js"></script>
+    <script src="/app/js/controllers/playerController.js"></script>
+  </body>
+</html>

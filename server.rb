@@ -5,7 +5,7 @@ require 'sinatra'
 set :sessions, true
 
 get '/' do
-  erb :main
+  File.read(File.join('public/app', 'index.html'))
 end
 
 
