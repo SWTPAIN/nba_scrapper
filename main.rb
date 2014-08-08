@@ -4,6 +4,8 @@ require 'sinatra'
 
 set :sessions, true
 
-
+get '/' do
+  erb :main
+end
 
 

@@ -1,0 +1,19 @@
+.header {
+top: 0;
+width: 100%;
+padding: 20px 0 10px;
+background: #fafafa;
+border-bottom: 5px solid #e6e6e6;
+text-align: center;
+z-index: 2;
+}
+
+.header-title {
+margin: 0;
+font-size: 55px;
+font-weight: normal;
+}
+
+.search {
+  margin: 20px auto;
+}
