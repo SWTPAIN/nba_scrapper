@@ -1,6 +1,6 @@
 angular.module('NbaScraper')
   .controller('PlayerController', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http){
-    $scope.player = "";
+    $scope.playerName = "";
     $scope.searchPlayer = function(playerName){
       $http.post('/search', playerName)
         .success(function(data, status){
