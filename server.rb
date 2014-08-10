@@ -16,8 +16,10 @@ post '/search' do
     player_games_stat = scrapping_player_stat(ng_params)
     status 200
     body(player_games_stat.to_json)
-  rescue
+    puts "Sent a json response back"
+  rescue =>error
     status 400
+    puts error.backtrace
     body("There is some unknown error.")
   end
 end

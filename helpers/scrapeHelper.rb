@@ -2,7 +2,7 @@ helpers do
 
   def scrapping_player_stat(player_name)
     #get the player name keyword for getting the correct url
-    firstname, lastname = player_name.strip.downcase!.split(" ")
+    firstname, lastname = player_name.strip.downcase.split(" ")
     player_keyword = lastname[0,5] + firstname[0,2]
     player_info = {}
 
@@ -11,10 +11,6 @@ helpers do
 
     data = Nokogiri::HTML(open(url))
     years_played = []
-
-    data.xpath("//table[@id='totals']/tbody/tr[not(contains(@class, 'italic_text'))]").each do |tr|
-      years_played << tr.css('td')[0].text[0,4].to_i + 1  
-    end
 
     if (player_info[:fullName] = data.xpath("//h1").text()) != "File Not Found"
       data.xpath("//table[@id='totals']/tbody/tr[not(contains(@class, 'italic_text'))]").each do |tr|
@@ -39,7 +35,7 @@ helpers do
         years_played.each do |year|
           url = "http://www.basketball-reference.com/players/#{lastname[0]}/#{player_keyword}01/gamelog/#{year}/"
           data = Nokogiri::HTML(open(url))
-          year_game_stat = {year: year, gameStat: []}
+          year_game_stat = {year: year, yearGameStat: []}
           data.xpath("//table[@id=\"pgl_basic\"]/tbody/tr[not(contains(@class, 'thead')) and not(contains(@class, 'italic_text')) and not(contains(@id, '.0'))]").each do |tr|
             d = tr.css('td')
             each_game = {
@@ -59,14 +55,15 @@ helpers do
               fta: d[17].text.strip,
               orb: d[19].text.strip,
               drb: d[20].text.strip,
-              stl: d[22].text.strip,
-              blk: d[23].text.strip,
-              tov: d[24].text.strip,
-              pf: d[25].text.strip,
-              pts: d[26].text.strip,
+              ast: d[22].text.strip,
+              stl: d[23].text.strip,
+              blk: d[24].text.strip,
+              tov: d[25].text.strip,
+              pf: d[26].text.strip,
+              pts: d[27].text.strip,
               plus_minus: d[28].text.strip
             }
-            year_game_stat[:gameStat] << each_game
+            year_game_stat[:yearGameStat] << each_game
           end
           yearly_game_stat[:yearlyGameStat] << year_game_stat
         end
@@ -104,7 +101,8 @@ helpers do
   end
 
   def parse_age(age)
-    age.sub('-','.').to_f
+    year, days = age.split('-')
+    (year.to_i + days.gsub(/^[0]+/,'').to_i/365.0).round(3)
   end
 
 end
