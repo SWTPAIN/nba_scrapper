@@ -1,4 +1,4 @@
-angular.module('NbaScraper', ['ngRoute'])
+angular.module('NbaScraper', ['ngRoute', 'nvd3'])
   .config(['$routeProvider',function($routeProvider){
     $routeProvider
       .when('/', {

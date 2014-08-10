@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<meta charset="utf-8">
+<html lang="en" ng-app="NbaScraper">
   <head>
-    <meta charset="utf-8"/>
     <title>NBA Scraper</title>
     <link href="/app/css/style.css" rel="stylesheet"/>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/nvd3/1.1.15-beta/nv.d3.min.css">
   </head>
-  <body ng-app="NbaScraper">
+  <body >
     <div class="header">
       <h1 class="header-title">NBA Scraper</h1>
       <p class="header-desctiption">Simple app to scrap NBA data</p>
@@ -16,6 +17,9 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/nvd3/1.1.15-beta/nv.d3.min.js"></script>
+    <script src="/vendor/js/angularjs-nvd3.min.js"></script>
     <script src="/app/app.js"></script>
     <script src="/app/js/controllers/playerController.js"></script>
     <script src="/app/js/services/playerStat.js"></script>
