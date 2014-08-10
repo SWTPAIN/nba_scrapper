@@ -4,7 +4,7 @@
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
         <label class="sr-only" for="">Enter search terms</label>
-        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^[^0-9]+$/">
+        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z]+\s+)[a-zA-Z]+$/">
       </div>
       <button type="submit" id="s" class="btn btn-default" ng-disabled="!searchForm.$valid || isProcessing" >
         <span class="glyphicon glyphicon-search"></span>
