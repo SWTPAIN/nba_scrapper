@@ -20,7 +20,7 @@ post '/search' do
   rescue =>error
     status 400
     puts error.backtrace
-    body("There is some unknown error.")
+    body(error.message)
   end
 end
 

@@ -1,5 +1,9 @@
 <div class="row search">
   <div class="col-md-4">
+    <toaster-container></toaster-container>
+    <div>
+      <button ng-click="pop()">Show a Toaster</button>
+    </div>
     <form class="form-inline" name="searchForm" role="form"  ng-submit="searchPlayer(playerName)" novalidate>
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
@@ -7,17 +11,14 @@
         <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z]+\s+)[a-zA-Z]+$/">
       </div>
       <button type="submit" id="s" class="btn btn-default" ng-disabled="!searchForm.$valid || isProcessing" >
-        <span class="glyphicon glyphicon-search"></span>
+        <span ng-show="isProcessing" class="blink_me">Loading</span>
+        <span ng-hide="isProcessing" class="glyphicon glyphicon-search"></span>
       </button>
     </form>
   </div>
   <div class="col-md-8">
-    <div ng-show="isProcessing" id="load"></div>  
-    <div class="svgWrapper"></div>
-    <nvd3 options='options' data='data'></nvd3>
-
+    <div class="svgWrapper">
+      <nvd3 options='options' data='data'></nvd3>
+    </div>
   </div>
 </div>
-
-
-<!-- ng-click="searchPlayer(playerName)" -->

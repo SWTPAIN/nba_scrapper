@@ -1,21 +1,35 @@
 angular.module('NbaScraper')
-  .controller('PlayerController', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http){
+  .controller('PlayerController', ['$scope', '$rootScope', '$http', 'toaster', function($scope, $rootScope, $http ,toaster){
     $scope.playerName = "";
     $scope.playerStat = {};
+    $scope.isProcessing = false;
     $scope.searchPlayer = function(playerName){
       $scope.isProcessing = true;
       $http.post('/search', playerName)
         .success(function(data, status){
           $scope.playerStat = data;
-          console.log(data);
           $scope.isProcessing = false;
-          $scope.data = getScoreData($scope.playerStat);  
         })
         .error(function(data, status){
-          $scope.playerStat = data;
+          console.log(data);
           $scope.isProcessing = false;
+          $scope.notification = data
         });
     };
+
+  $scope.$watch('playerStat', function(newVal, oldVal){
+    if(oldVal == newVal) return;
+    $scope.data = getScoreData($scope.playerStat);
+  })
+
+  $scope.$watch('notification', function(newVal, oldVal){
+    if(oldVal == newVal) return;
+    $scope.pop();
+  })  
+
+  $scope.pop = function(){
+    toaster.pop('error', "Error", $scope.notification, 6000);
+  };
 
   $scope.options = {
             chart: {
@@ -90,7 +104,11 @@ angular.module('NbaScraper')
             ]
           }
           
-          var games = data.yearlyGameStat[0].yearGameStat;
+          var totalgames = _.flatten(data.yearlyGameStat.map(function(ys){
+            return ys.yearGameStat
+          }))
+
+          var games = totalgames;
           for ( var i=0; i<games.length-1; i++){
             firstYear.push({
               x:  games[i].age*1,
@@ -101,7 +119,7 @@ angular.module('NbaScraper')
           return [
             {
               values: firstYear,
-              keys: 'First Year Scoring',
+              key: 'Career Scoring',
               color: '#ff7f0e'
             }
           ]

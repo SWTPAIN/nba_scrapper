@@ -69,7 +69,8 @@ helpers do
         end
       end
     else
-      puts "There is no such player"
+      puts "There is no such player (#{player_name})."
+      raise "There is no such player (#{player_name})."
     end  
     player_info.merge(yearly_game_stat)
   end
