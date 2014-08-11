@@ -1,25 +1,25 @@
 angular.module('NbaScraper')
   .controller('PlayerController', ['$scope', '$rootScope', '$http', 'toaster', function($scope, $rootScope, $http ,toaster){
     $scope.playerName = "";
-    $scope.playerStat = {};
+    $scope.playerData = {};
+    $scope.playersData =[]; //initial values
     $scope.isProcessing = false;
     $scope.searchPlayer = function(playerName){
       $scope.isProcessing = true;
       $http.post('/search', playerName)
         .success(function(data, status){
-          $scope.playerStat = data;
+          $scope.playerData = data;
           $scope.isProcessing = false;
         })
         .error(function(data, status){
-          console.log(data);
           $scope.isProcessing = false;
           $scope.notification = data
         });
     };
 
-  $scope.$watch('playerStat', function(newVal, oldVal){
+  $scope.$watch('playerData', function(newVal, oldVal){
     if(oldVal == newVal) return;
-    $scope.data = getScoreData($scope.playerStat);
+    $scope.playersData.push(getScoreData(newVal));
   })
 
   $scope.$watch('notification', function(newVal, oldVal){
@@ -45,16 +45,16 @@ angular.module('NbaScraper')
               y: function(d){ return d.y; },
               useInteractiveGuideline: true,
               dispatch: {
-                  stateChange: function(e){ console.log("stateChange"); },
-                  changeState: function(e){ console.log("changeState"); },
-                  tooltipShow: function(e){ console.log("tooltipShow"); },
-                  tooltipHide: function(e){ console.log("tooltipHide"); }
+                  // stateChange: function(e){ console.log("stateChange"); },
+                  // changeState: function(e){ console.log("changeState"); },
+                  // tooltipShow: function(e){ console.log("tooltipShow"); },
+                  // tooltipHide: function(e){ console.log("tooltipHide"); }
               },
               xAxis: {
                   axisLabel: 'Age',
                   tickFormat: function(d){
                       return d3.format(',.2f')(d);
-                  }                  
+                  }
               },
               yAxis: {
                   axisLabel: 'Points',
@@ -87,42 +87,45 @@ angular.module('NbaScraper')
                 'margin': '10px 13px 0px 7px'
               }
             }
-        };
+  };
 
-        // $scope.data = sinAndCos();
-        $scope.data = getScoreData($scope.playerStat);  
+  //Getting the first year scoring data
+  function getScoreData(data){
+    var firstYear = [];
+    // if (Object.getOwnPropertyNames(data).length === 0){
+    //   return [
+    //     {
+    //       values: [ {x:0, y:0}]
+    //     }
+    //   ]
+    // }
+    
+    var totalgames = _.flatten(data.yearlyGameStat.map(function(ys){
+      return ys.yearGameStat
+    }))
 
+    var games = totalgames;
+    for ( var i=0; i<games.length-1; i++){
+      firstYear.push({
+        x:  games[i].age*1,
+        y:  games[i].pts*1             
+      })
+    };
 
-        //Getting the first year scoring data
-        function getScoreData(data){
-          var firstYear = [];
-          if (Object.getOwnPropertyNames(data).length === 0){
-            return [
-              {
-                values: [ {x:0, y:0}]
-              }
-            ]
-          }
-          
-          var totalgames = _.flatten(data.yearlyGameStat.map(function(ys){
-            return ys.yearGameStat
-          }))
+    return {
+        values: firstYear,
+        key: data.fullName,
+        color: getRandomColor()
+    }
+  }; 
 
-          var games = totalgames;
-          for ( var i=0; i<games.length-1; i++){
-            firstYear.push({
-              x:  games[i].age*1,
-              y:  games[i].pts*1             
-            })
-          };
+  function getRandomColor(){
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#'
+    for (var i=0; i<6; i++){
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
 
-          return [
-            {
-              values: firstYear,
-              key: 'Career Scoring',
-              color: '#ff7f0e'
-            }
-          ]
-        }; 
-
-  }])
+}]);

@@ -1,9 +1,6 @@
 <div class="row search">
   <div class="col-md-4">
     <toaster-container></toaster-container>
-    <div>
-      <button ng-click="pop()">Show a Toaster</button>
-    </div>
     <form class="form-inline" name="searchForm" role="form"  ng-submit="searchPlayer(playerName)" novalidate>
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
@@ -18,7 +15,7 @@
   </div>
   <div class="col-md-8">
     <div class="svgWrapper">
-      <nvd3 options='options' data='data'></nvd3>
+      <nvd3 options='options' data='playersData'></nvd3>
     </div>
   </div>
 </div>
