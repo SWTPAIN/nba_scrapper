@@ -31,11 +31,12 @@ helpers do
       if years_played.empty?
         puts "The game has no game record."
       else
-        yearly_game_stat = {yearlyGameStat: []}
+        games_stat = {games_stat: []}
+        # yearly_game_stat = {yearlyGameStat: []}
         years_played.each do |year|
           url = "http://www.basketball-reference.com/players/#{lastname[0]}/#{player_keyword}01/gamelog/#{year}/"
           data = Nokogiri::HTML(open(url))
-          year_game_stat = {year: year, yearGameStat: []}
+          # year_game_stat = {year: year, yearGameStat: []}
           data.xpath("//table[@id=\"pgl_basic\"]/tbody/tr[not(contains(@class, 'thead')) and not(contains(@class, 'italic_text')) and not(contains(@id, '.0'))]").each do |tr|
             d = tr.css('td')
             each_game = {
@@ -63,16 +64,18 @@ helpers do
               pts: d[27].text.strip,
               plus_minus: d[28].text.strip
             }
-            year_game_stat[:yearGameStat] << each_game
+            games_stat[:games_stat] << each_game
+            # year_game_stat[:yearGameStat] << each_game
           end
-          yearly_game_stat[:yearlyGameStat] << year_game_stat
+          # yearly_game_stat[:yearlyGameStat] << year_game_stat
         end
       end
     else
       puts "There is no such player (#{player_name})."
       raise "There is no such player (#{player_name})."
     end  
-    player_info.merge(yearly_game_stat)
+    player_info.merge(games_stat)
+    # player_info.merge(yearly_game_stat)
   end
 
   private

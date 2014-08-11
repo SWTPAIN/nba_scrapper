@@ -18,7 +18,8 @@ angular.module('NbaScraper')
     };
 
   $scope.$watch('playerData', function(newVal, oldVal){
-    if(oldVal == newVal) return;
+    if( _.isEqual(oldVal, newVal) ) return;
+          console.log(oldVal==newVal);
     $scope.playersData.push(getScoreData(newVal));
   })
 
@@ -100,9 +101,7 @@ angular.module('NbaScraper')
     //   ]
     // }
     
-    var totalgames = _.flatten(data.yearlyGameStat.map(function(ys){
-      return ys.yearGameStat
-    }))
+    var totalgames = data.games_stat
 
     var games = totalgames;
     for ( var i=0; i<games.length-1; i++){
