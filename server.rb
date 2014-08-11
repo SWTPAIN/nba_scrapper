@@ -10,14 +10,42 @@ Mongoid.load!("config/mongoid.yml")
 
 class Player
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :full_name, type: String
   field :position, type: Array, default: []
   field :height, type: Integer
   field :weight, type: Integer
-  embeds_many :year_game_stat
+  embeds_many :games_stat, class_name: "GameStat"
+end
 
-  accepts_nested_attributes_for :year_game_stat
+class GameStat
+  include Mongoid::Document
+
+  field :date, type: Date
+  field :age, type: Float
+  field :team, type: String
+  field :homecourt_flag, type: Boolean
+  field :opp, type: String
+  field :result, type: String
+  field :gs_flag, type: Boolean
+  field :mp, type: String 
+  field :fg, type: Integer 
+  field :fga, type: Integer 
+  field :three_pt, type: Integer 
+  field :three_pta, type: Integer 
+  field :ft, type: Integer 
+  field :fta, type: Integer 
+  field :orb, type: Integer 
+  field :drb, type: Integer 
+  field :ast, type: Integer 
+  field :stl, type: Integer 
+  field :blk, type: Integer 
+  field :tov, type: Integer 
+  field :pf, type: Integer 
+  field :pts, type: Integer 
+  field :plus_minus, type: Integer
+  embedded_in :player 
 end
 
 
@@ -30,6 +58,17 @@ post '/search' do
   ng_params = env['rack.input'].gets #request.body.read
   begin
     player_games_stat = scrapping_player_stat(ng_params)
+    player = Player.create!(
+      full_name: player_games_stat[:full_name],
+      position: player_games_stat[:position],
+      height: player_games_stat[:height],
+      weight: player_games_stat[:weight]
+    )
+    player_games_stat[:games_stat].each do |game_stat|
+      player.games_stat.push(
+        GameStat.new(game_stat)
+      )       
+    end
     status 200
     body(player_games_stat.to_json)
     puts "Sent a json response back"

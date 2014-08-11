@@ -8,6 +8,7 @@ angular.module('NbaScraper')
       $scope.isProcessing = true;
       $http.post('/search', playerName)
         .success(function(data, status){
+          console.log(data);
           $scope.playerData = data;
           $scope.isProcessing = false;
         })
@@ -113,7 +114,7 @@ angular.module('NbaScraper')
 
     return {
         values: firstYear,
-        key: data.fullName,
+        key: data.full_name,
         color: getRandomColor()
     }
   }; 

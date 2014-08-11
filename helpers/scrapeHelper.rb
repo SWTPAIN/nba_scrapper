@@ -12,7 +12,7 @@ helpers do
     data = Nokogiri::HTML(open(url))
     years_played = []
 
-    if (player_info[:fullName] = data.xpath("//h1").text()) != "File Not Found"
+    if (player_info[:full_name] = data.xpath("//h1").text()) != "File Not Found"
       data.xpath("//table[@id='totals']/tbody/tr[not(contains(@class, 'italic_text'))]").each do |tr|
         years_played << tr.css('td')[0].text[0,4].to_i + 1  
       end
