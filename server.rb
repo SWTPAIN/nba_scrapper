@@ -88,7 +88,6 @@ post '/search' do
 
   begin
     ng_params = env['rack.input'].gets #request.body.read
-    require 'pry';binding.pry
     regex_for_search = ng_params.split(' ').reduce(''){|r, word| r+= "(?=.*"+word+")"}
     search_result = Player.where(full_name: /#{regex_for_search}.*/i).order_by(:dob.desc)
     if search_result.count == 0
