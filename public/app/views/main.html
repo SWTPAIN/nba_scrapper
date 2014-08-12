@@ -5,17 +5,27 @@
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
         <label class="sr-only" for="">Enter search terms</label>
-        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z]+\s+)[a-zA-Z]+$/">
+        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z\s]+)/">
       </div>
       <button type="submit" id="s" class="btn btn-default" ng-disabled="!searchForm.$valid || isProcessing" >
         <span ng-show="isProcessing" class="blink_me">Loading</span>
         <span ng-hide="isProcessing" class="glyphicon glyphicon-search"></span>
       </button>
     </form>
+    <div id="player_result_list_container">
+      <ul>
+        <li ng-repeat="nameitem in player_namelist" ng-click="scrapePlayer(nameitem.name_key)" >
+          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}cm {{nameitem.weight}}pounds</span> 
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="col-md-8">
     <div class="svgWrapper">
-      <nvd3 options='options' data='playersData'></nvd3>
+      <div class="btn-group" >
+        <button ng-repeat="type in statTypes" ng-click="setStatType(type)"type="button" class="btn btn-default">{{type.name}}</button>
+      </div>
+      <nvd3 options='options' data='presentedData'></nvd3>
     </div>
   </div>
 </div>

@@ -1,41 +1,28 @@
 helpers do
 
-  def scrapping_player_stat(player_name)
+  def scrapping_player_stat(name_key)
     #get the player name keyword for getting the correct url
-    firstname, lastname = player_name.strip.downcase.split(" ")
-    player_keyword = lastname[0,5] + firstname[0,2]
-    player_info = {}
 
     #findout which years the player play at least one game
-    url = "http://www.basketball-reference.com/players/#{lastname[0]}/#{player_keyword}01.html"
+    url = "http://www.basketball-reference.com/players/#{name_key[0]}/#{name_key}.html"
 
     data = Nokogiri::HTML(open(url))
     years_played = []
 
-    if (player_info[:fullName] = data.xpath("//h1").text()) != "File Not Found"
+    if (player_name = data.xpath("//h1").text()) != "File Not Found"
       data.xpath("//table[@id='totals']/tbody/tr[not(contains(@class, 'italic_text'))]").each do |tr|
         years_played << tr.css('td')[0].text[0,4].to_i + 1  
       end
-      #There are two html structure for old player and new player.
-      if (data.xpath("//div[@class='person_image_offset']").empty?)
-        player_info[:position] = data.xpath("//div[@id='info_box']/p[2]/text()[1]").text()
-        player_info[:height] = data.xpath("//div[@id='info_box']/p[2]/text()[3]").text()
-        player_info[:weight] = data.xpath("//div[@id='info_box']/p[2]/text()[4]").text()
-      else
-        player_info[:position] = data.xpath("//div[@class='person_image_offset']/p[2]/text()[1]").text()
-        player_info[:height] = data.xpath("//div[@class='person_image_offset']/p[2]/text()[3]").text()
-        player_info[:weight] = data.xpath("//div[@class='person_image_offset']/p[2]/text()[4]").text()
-      end
-      player_info  = normalize_player_info(player_info)
 
       if years_played.empty?
         puts "The game has no game record."
       else
-        yearly_game_stat = {yearlyGameStat: []}
+        games_stat = []
+        # yearly_game_stat = {yearlyGameStat: []}
         years_played.each do |year|
-          url = "http://www.basketball-reference.com/players/#{lastname[0]}/#{player_keyword}01/gamelog/#{year}/"
+          url = "http://www.basketball-reference.com/players/#{name_key[0]}/#{name_key}/gamelog/#{year}/"
           data = Nokogiri::HTML(open(url))
-          year_game_stat = {year: year, yearGameStat: []}
+          # year_game_stat = {year: year, yearGameStat: []}
           data.xpath("//table[@id=\"pgl_basic\"]/tbody/tr[not(contains(@class, 'thead')) and not(contains(@class, 'italic_text')) and not(contains(@id, '.0'))]").each do |tr|
             d = tr.css('td')
             each_game = {
@@ -63,19 +50,65 @@ helpers do
               pts: d[27].text.strip,
               plus_minus: d[28].text.strip
             }
-            year_game_stat[:yearGameStat] << each_game
+            games_stat << each_game
           end
-          yearly_game_stat[:yearlyGameStat] << year_game_stat
         end
       end
     else
       puts "There is no such player (#{player_name})."
       raise "There is no such player (#{player_name})."
     end  
-    player_info.merge(yearly_game_stat)
+    games_stat
+  end
+
+  def scrapping_player_namelist(player_name)
+
+    search_term = player_name.strip.gsub(' ','+')
+
+    url = "http://www.basketball-reference.com/player_search.cgi?search=#{search_term}"
+    data = Nokogiri::HTML(open(url))
+
+    if data.xpath("/html/body/div[1]/div[3]/table").empty?
+      puts "Could not found this player (#{player_name})."
+      raise "Could not found this player (#{player_name})."
+    else 
+      search_result = data.xpath("/html/body/div[1]/div[3]/table/tr")[0..10].map do |tr|
+        {
+          player_name: tr.css('td')[0].text(),
+          player_info: tr.css('td')[3].text() + ' ' + tr.css('td')[4].text()
+        }
+      end
+    end
+    search_result
+
+  end
+
+  def scrape_player_namelist
+
+    ('a'..'z').each do |char|
+      url = "http://www.basketball-reference.com/players/#{char}/"
+      data = Nokogiri::HTML(open(url))
+
+      data.xpath("//div[@id='div_players']/table/tbody/tr").each do |tr|
+        Player.create!(
+          full_name: tr.css('td')[0].text(),
+          position: tr.css('td')[3].text().split('-'),
+          height: inches_to_cm(tr.css('td')[4].text()),
+          weight: tr.css('td')[5].text(),
+          dob: tr.css('td')[6].text(),
+          name_key: parse_name_key(tr)
+        )
+      end
+    end
+    
   end
 
   private
+
+  def parse_name_key(tr)
+    href_attr = tr.css('a')[0].attribute('href')
+    href_attr == nil ? nil : href_attr.value.split('/').last.sub('.html','')
+  end
 
   def normalize_player_info(player_info)
     player_info[:position] = normalize_position(player_info[:position])
