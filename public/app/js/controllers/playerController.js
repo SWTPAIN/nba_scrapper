@@ -121,7 +121,7 @@ angular.module('NbaScraper')
             },
             caption: {
               enable: true,
-              html: '<b>Reference:</b> http://www.basketball-reference.com',
+              html: '<b>Reference:</b> http://www.basketball-reference.com<br/> <p>Have an idea for exploring data? Send me a email! kafaicoder@gmail.com<p>',
               css: {
                 'text-align': 'justify',
                 'text-font': '10px',

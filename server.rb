@@ -78,30 +78,34 @@ post '/scrape' do
     rescue =>error
       status 400
       puts error.backtrace
-      body(error.message)
+      body("There is some problem in the server. Please try it again.")
     end
   end
 end
 
 post '/search' do
   content_type :json
-  ng_params = env['rack.input'].gets #request.body.read
-  regex_for_search = ng_params.split(' ').reduce(''){|r, word| r+= "(?=.*"+word+")"}
-  search_result = Player.where(full_name: /#{regex_for_search}.*/i).order_by(:dob.desc)
-  if search_result.count == 0
-    status 404
-    puts "Could not find such player"
-    body("Could not find such player")
-  else
-    player_namelist = search_result.to_a[0..9]
-    status 200
-    body(player_namelist.to_json)
-    puts "Sent a json response back"
-  end
-  begin
-  rescue =>error
 
+  begin
+    ng_params = env['rack.input'].gets #request.body.read
+    require 'pry';binding.pry
+    regex_for_search = ng_params.split(' ').reduce(''){|r, word| r+= "(?=.*"+word+")"}
+    search_result = Player.where(full_name: /#{regex_for_search}.*/i).order_by(:dob.desc)
+    if search_result.count == 0
+      status 404
+      puts "Could not find such player"
+      body("Could not find such player")
+    else
+      player_namelist = search_result.to_a[0..9]
+      status 200
+      body(player_namelist.to_json)
+      puts "Sent a json response back"
     end
+  rescue =>error
+    status 500
+    puts error.backtrace
+    body("There is some problem in the server. Please try it again.")    
+  end
 end
 
 get '/runscrapping' do
