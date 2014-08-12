@@ -5,8 +5,6 @@ development:
       hosts:
         - localhost:27017
 production:
-host: prod_host
-port: 1000
-username: main
-password: blabla
-database: cool_demo
+  sessions:
+    default:
+      uri: <%= ENV['MONGOHQ_URL'] %>
