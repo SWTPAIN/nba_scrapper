@@ -1,5 +1,5 @@
 <div class="row search">
-  <div class="col-sm-4">
+  <div class="col-md-4">
     <toaster-container></toaster-container>
     <form class="form-inline" name="searchForm" role="form"  ng-submit="searchPlayer(playerName)" novalidate>
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
@@ -20,7 +20,7 @@
       </ul>
     </div>
   </div>
-  <div class="col-sm-8">
+  <div class="col-md-8">
     <div class="svgWrapper">
       <div class="btn-group" >
         <button ng-repeat="type in statTypes" ng-click="setStatType(type)"type="button" class="btn btn-default">{{type.name}}</button>

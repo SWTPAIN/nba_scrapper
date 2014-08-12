@@ -4,6 +4,8 @@ width: 100%;
 padding: 20px 0 10px;
 background: #fafafa;
 border-bottom: 5px solid #e6e6e6;
+border-color: #2980b9;
+color: #2980b9;
 text-align: center;
 z-index: 2;
 }
