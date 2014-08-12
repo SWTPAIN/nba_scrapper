@@ -1,2 +1,5 @@
-require File.join(File.dirname(__FILE__), 'server.rb')
+$:.unshift File.expand_path("../", __FILE__)
+require 'rubygems'
+require 'sinatra'
+require './server'
 run Sinatra::Application
