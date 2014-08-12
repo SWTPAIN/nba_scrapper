@@ -9,6 +9,20 @@ angular.module('NbaScraper')
       $http.post('/search', playerName)
         .success(function(data, status){
           console.log(data);
+          $scope.player_namelist = data;
+          $scope.isProcessing = false;
+        })
+        .error(function(data, status){
+          $scope.isProcessing = false;
+          $scope.notification = data
+        });
+    };
+    $scope.scrapePlayer = function(name_key){
+      if (name_key == null) return;
+      $scope.isProcessing = true;
+      $http.post('/scrape', name_key)
+        .success(function(data, status){
+          console.log(data);
           $scope.playerData = data;
           $scope.isProcessing = false;
         })

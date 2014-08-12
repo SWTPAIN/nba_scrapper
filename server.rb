@@ -3,6 +3,7 @@ require 'open-uri'
 require 'sinatra'
 require 'json'
 require 'mongoid'
+require 'date'
 require 'pry'
 require_relative 'helpers/scrapeHelper'
 
@@ -16,6 +17,8 @@ class Player
   field :position, type: Array, default: []
   field :height, type: Integer
   field :weight, type: Integer
+  field :dob, type: Date
+  field :name_key, type: String
   embeds_many :games_stat, class_name: "GameStat"
 end
 
@@ -53,30 +56,57 @@ get '/' do
   File.read(File.join('public/app', 'index.html'))
 end
 
-post '/search' do
+post '/scrape' do
   content_type :json
   ng_params = env['rack.input'].gets #request.body.read
-  begin
-    player_games_stat = scrapping_player_stat(ng_params)
-    player = Player.create!(
-      full_name: player_games_stat[:full_name],
-      position: player_games_stat[:position],
-      height: player_games_stat[:height],
-      weight: player_games_stat[:weight]
-    )
-    player_games_stat[:games_stat].each do |game_stat|
-      player.games_stat.push(
-        GameStat.new(game_stat)
-      )       
+  # check if the player already exist in the database
+  player = Player.where(name_key: ng_params).first
+  unless player.games_stat.empty?
+    body(player.to_json)
+  else
+    begin
+      player_games_stat = scrapping_player_stat(ng_params)
+      #Persist the web scrapped data into mongodb
+      player_games_stat.each do |game_stat|
+        player.games_stat.push(
+          GameStat.new(game_stat)
+        )       
+      end
+      status 200
+      body(player.to_json)
+      puts "Sent a json response back"
+    rescue =>error
+      status 400
+      puts error.backtrace
+      body(error.message)
     end
-    status 200
-    body(player_games_stat.to_json)
-    puts "Sent a json response back"
-  rescue =>error
-    status 400
-    puts error.backtrace
-    body(error.message)
   end
 end
 
+post '/search' do
+  content_type :json
+  ng_params = env['rack.input'].gets #request.body.read
+  regex_for_search = ng_params.split(' ').reduce(''){|r, word| r+= "(?=.*"+word+")"}
+  search_result = Player.where(full_name: /#{regex_for_search}.*/i).order_by(:dob.desc)
+  if search_result.count == 0
+    status 404
+    puts "Could not find such player"
+    body("Could not find such player")
+  else
+    player_namelist = search_result.to_a[0..9]
+    status 200
+    body(player_namelist.to_json)
+    puts "Sent a json response back"
+  end
+  begin
+  rescue =>error
+
+    end
+end
+
+get '/runscrapping' do
+
+  scrape_player_namelist
+  redirect to('/')
+end
 

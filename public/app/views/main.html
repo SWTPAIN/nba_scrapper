@@ -12,6 +12,13 @@
         <span ng-hide="isProcessing" class="glyphicon glyphicon-search"></span>
       </button>
     </form>
+    <div id="player_result_list_container">
+      <ul>
+        <li ng-repeat="nameitem in player_namelist" ng-click="scrapePlayer(nameitem.name_key)">
+          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}{{nameitem.weight}} {{nameitem.name_key}} </span> 
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="col-md-8">
     <div class="svgWrapper">
