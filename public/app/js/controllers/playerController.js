@@ -81,7 +81,7 @@ angular.module('NbaScraper')
     return {
             chart: {
               type: 'scatterChart',
-              width: '100%',
+              height: 350,
               margin : {
                   top: 20,
                   right: 20,
