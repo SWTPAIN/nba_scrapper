@@ -5,7 +5,7 @@
       <p class='warning' ng-show="searchForm.$error.pattern && searchForm.$dirty">Please type a valid player name. </p>
       <div class="form-group">
         <label class="sr-only" for="">Enter search terms</label>
-        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z]+\s+)[a-zA-Z]+$/">
+        <input type="search" class="form-control" ng-model="playerName" placeholder="Enter NBA player name" required ng-pattern="/^([a-zA-Z\s]+)/">
       </div>
       <button type="submit" id="s" class="btn btn-default" ng-disabled="!searchForm.$valid || isProcessing" >
         <span ng-show="isProcessing" class="blink_me">Loading</span>
@@ -15,7 +15,7 @@
     <div id="player_result_list_container">
       <ul>
         <li ng-repeat="nameitem in player_namelist" ng-click="scrapePlayer(nameitem.name_key)">
-          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}{{nameitem.weight}} {{nameitem.name_key}} </span> 
+          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}{{nameitem.weight}}</span> 
         </li>
       </ul>
     </div>
