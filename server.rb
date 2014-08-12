@@ -4,7 +4,6 @@ require 'sinatra'
 require 'json'
 require 'mongoid'
 require 'date'
-require 'pry'
 require_relative 'helpers/scrapeHelper'
 
 Mongoid.load!("config/mongoid.yml")
