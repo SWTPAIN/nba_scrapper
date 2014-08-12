@@ -14,15 +14,18 @@
     </form>
     <div id="player_result_list_container">
       <ul>
-        <li ng-repeat="nameitem in player_namelist" ng-click="scrapePlayer(nameitem.name_key)">
-          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}{{nameitem.weight}}</span> 
+        <li ng-repeat="nameitem in player_namelist" ng-click="scrapePlayer(nameitem.name_key)" >
+          {{nameitem.full_name}} <span>({{nameitem.dob}}) {{nameitem.position.join(', ')}} {{nameitem.height}}cm {{nameitem.weight}}pounds</span> 
         </li>
       </ul>
     </div>
   </div>
   <div class="col-md-8">
     <div class="svgWrapper">
-      <nvd3 options='options' data='playersData'></nvd3>
+      <div class="btn-group" >
+        <button ng-repeat="type in statTypes" ng-click="setStatType(type)"type="button" class="btn btn-default">{{type.name}}</button>
+      </div>
+      <nvd3 options='options' data='presentedData'></nvd3>
     </div>
   </div>
 </div>

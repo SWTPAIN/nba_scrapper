@@ -2,8 +2,26 @@ angular.module('NbaScraper')
   .controller('PlayerController', ['$scope', '$rootScope', '$http', 'toaster', function($scope, $rootScope, $http ,toaster){
     $scope.playerName = "";
     $scope.playerData = {};
-    $scope.playersData =[]; //initial values
+    $scope.totalData = [];
+    $scope.presentedData =[]; //initial values
+    $scope.currentStatType = {name: 'Point', shortName: 'pts'}
     $scope.isProcessing = false;
+    $scope.options = generateOptions();
+    $scope.statTypes = [
+      {name: 'Point', shortName: 'pts'},
+      {name: 'Assist', shortName: 'ast'},
+      {name: 'Rebound', shortName: 'reb'},
+      {name: 'Steal', shortName: 'stl'},
+      {name: 'Block', shortName: 'blk'},
+      {name: 'Free Point', shortName: 'ft'},
+      {name: 'Plus Minus', shortName: 'plus_minus'}
+    ];
+
+    $scope.setStatType = function(type){
+      $scope.currentStatType = type;
+    }
+
+
     $scope.searchPlayer = function(playerName){
       $scope.isProcessing = true;
       $http.post('/search', playerName)
@@ -17,12 +35,12 @@ angular.module('NbaScraper')
           $scope.notification = data
         });
     };
+
     $scope.scrapePlayer = function(name_key){
-      if (name_key == null) return;
+      if (name_key == null || $scope.isProcessing) return;
       $scope.isProcessing = true;
       $http.post('/scrape', name_key)
         .success(function(data, status){
-          console.log(data);
           $scope.playerData = data;
           $scope.isProcessing = false;
         })
@@ -34,10 +52,20 @@ angular.module('NbaScraper')
 
   $scope.$watch('playerData', function(newVal, oldVal){
     if( _.isEqual(oldVal, newVal) ) return;
-          console.log(oldVal==newVal);
-    $scope.playersData.push(getScoreData(newVal));
+    $scope.totalData.push(newVal);
+    $scope.presentedData.push(toAnotherType(newVal, $scope.currentStatType.shortName))
   })
 
+  $scope.$watch('currentStatType', function(newVal, oldVal){
+    if( _.isEqual(oldVal, newVal) ) return;
+    $scope.presentedData = getPresentedData($scope.totalData, $scope.currentStatType.shortName)
+    $scope.options = generateOptions();
+  })
+
+  $scope.$watch('totalData', function(newVal, oldVal){
+    if( _.isEqual(oldVal, newVal) ) return;
+    $scope.totalData.push(newVal);   
+  })
   $scope.$watch('notification', function(newVal, oldVal){
     if(oldVal == newVal) return;
     $scope.pop();
@@ -47,10 +75,13 @@ angular.module('NbaScraper')
     toaster.pop('error', "Error", $scope.notification, 6000);
   };
 
-  $scope.options = {
+
+  function generateOptions(){
+
+    return {
             chart: {
-              type: 'lineChart',
-              height: 200,
+              type: 'scatterChart',
+              height: 400,
               margin : {
                   top: 20,
                   right: 20,
@@ -60,12 +91,6 @@ angular.module('NbaScraper')
               x: function(d){ return d.x; },
               y: function(d){ return d.y; },
               useInteractiveGuideline: true,
-              dispatch: {
-                  // stateChange: function(e){ console.log("stateChange"); },
-                  // changeState: function(e){ console.log("changeState"); },
-                  // tooltipShow: function(e){ console.log("tooltipShow"); },
-                  // tooltipHide: function(e){ console.log("tooltipHide"); }
-              },
               xAxis: {
                   axisLabel: 'Age',
                   tickFormat: function(d){
@@ -73,15 +98,14 @@ angular.module('NbaScraper')
                   }
               },
               yAxis: {
-                  axisLabel: 'Points',
+                  axisLabel: $scope.currentStatType.name,
                   tickFormat: function(d){
                       return d3.format(',.2f')(d);
                   },
                   axisLabelDistance: 30
               },
-              callback: function(chart){
-                  console.log("!!! lineChart callback !!!");
-              }
+              transitionDuration: 500,
+              interpolate: 'linear'
             },
             title: {
               enable: true,
@@ -89,7 +113,7 @@ angular.module('NbaScraper')
             },
             subtitle: {
               enable: true,
-              text: 'Scoring aganist age',
+              text: $scope.currentStatType.name + ' aganist age',
               css: {
                 'text-align': 'center',
                 'margin': '10px 13px 0px 7px'
@@ -97,41 +121,51 @@ angular.module('NbaScraper')
             },
             caption: {
               enable: true,
-              html: '<b>Figure 1.</b>',
+              html: '<b>Reference:</b> http://www.basketball-reference.com',
               css: {
                 'text-align': 'justify',
+                'text-font': '10px',
                 'margin': '10px 13px 0px 7px'
               }
             }
+           };
+  }
+
+  function getPresentedData(data, type){
+    var output_data = [];
+    for (var i=0; i<data.length; i++){
+      output_data.push(toAnotherType(data[i], type));
+    }
+    return output_data
   };
 
-  //Getting the first year scoring data
-  function getScoreData(data){
-    var firstYear = [];
-    // if (Object.getOwnPropertyNames(data).length === 0){
-    //   return [
-    //     {
-    //       values: [ {x:0, y:0}]
-    //     }
-    //   ]
-    // }
-    
-    var totalgames = data.games_stat
+  function toAnotherType(player_stat, type){
+    var totalYears = [];
+    var totalgames = player_stat.games_stat;
 
     var games = totalgames;
-    for ( var i=0; i<games.length-1; i++){
-      firstYear.push({
-        x:  games[i].age*1,
-        y:  games[i].pts*1             
-      })
+    if (type == 'reb') {
+      for ( var i=0; i<games.length-1; i++){
+        totalYears.push({
+          x:  games[i].age*1,
+          y:  games[i]['orb']*1 + games[i]['drb']*1             
+        })
+      };
+    } else {
+      for ( var i=0; i<games.length-1; i++){
+        totalYears.push({
+          x:  games[i].age*1,
+          y:  games[i][type]*1             
+        })
+      };
     };
 
     return {
-        values: firstYear,
-        key: data.full_name,
+        values: totalYears,
+        key: player_stat.full_name,
         color: getRandomColor()
     }
-  }; 
+  };
 
   function getRandomColor(){
     var letters = '0123456789ABCDEF'.split('');
