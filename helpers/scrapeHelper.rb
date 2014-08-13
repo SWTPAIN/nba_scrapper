@@ -105,6 +105,7 @@ helpers do
 
   def scrape_player_advanced_stat(name_key)
     url = "http://www.basketball-reference.com/players/#{name_key[0]}/#{name_key}.html"
+    puts url
     data = Nokogiri::HTML(open(url))
     advanced_stat = []
     data.xpath("//table[@id='advanced']/tbody/tr").each do |tr|
@@ -129,6 +130,7 @@ helpers do
     data.xpath("//table[@id='stats']/tbody/tr[not(contains(@class, 'thead'))]")[0..59].each do |tr|
       player_draft_info = {
                 full_name: tr.css('td')[3].text(),
+                drafted_year: year,
                 pick: tr.css('td')[1].text(),
                 pick_team: tr.css('td')[2].text(),
                 name_key: tr.css('td')[3].child.attributes['href'] ? tr.css('td')[3].child.attributes['href'].value.split('/').last.sub('.html','') : nil
@@ -138,6 +140,7 @@ helpers do
         player = Player.where(name_key: player_draft_info[:name_key]).first
         if player
           #updating the player advanced stat
+          player.drafted_year = player_draft_info[:drafted_year]
           player.pick = player_draft_info[:pick]
           player.pick_team = player_draft_info[:pick_team]
           player.advanced_stat = [];

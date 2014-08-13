@@ -19,6 +19,7 @@ class Player
   field :weight, type: Integer
   field :dob, type: Date
   field :name_key, type: String
+  field :drafted_year, type: String
   field :pick, type: Integer
   field :pick_team, type: String
   embeds_many :games_stat, class_name: "GameStat"
@@ -73,13 +74,21 @@ get '/' do
   File.read(File.join('public/app', 'index.html'))
 end
 
+get '/advanced_data' do
+  content_type :json
+  drafted_players = Player.where(:pick.gte => 0, :drafted_year.gte => 1983)
+  status 200
+  body(drafted_players.to_json(except: [:_id, :games_stat]))
+end
+
+
 post '/scrape' do
   content_type :json
   ng_params = env['rack.input'].gets #request.body.read
   # check if the player already exist in the database
   player = Player.where(name_key: ng_params).first
   unless player.games_stat.empty?
-    body(player.to_json)
+    body( player.to_json(except: [:_id, :drafted_year, :pick, :pick_team, :advanced_stat]))
   else
     begin
       player_games_stat = scrapping_player_stat(ng_params)
@@ -90,7 +99,7 @@ post '/scrape' do
         )       
       end
       status 200
-      body(player.to_json)
+      body(player.to_json(except: [:_id, :drafted_year, :pick, :pick_team, :advanced_stat]))
       puts "Sent a json response back"
     rescue =>error
       status 400
@@ -114,8 +123,8 @@ post '/search' do
     else
       player_namelist = search_result.to_a[0..9]
       status 200
-      body(player_namelist.to_json)
-      puts "Sent a json response back"
+      body(player_namelist.to_json(except: [:_id, :advanced_stat, :games_stat]))
+        puts "Sent a json response back"
     end
   rescue =>error
     status 500
@@ -132,7 +141,7 @@ end
 
 
 get '/runscrappingplayeradvancedstat' do
-  (1983..2013).each do |year|
+  (2010..2010).each do |year|
     scrape_player_draft_pick(year)
   end
   redirect to('/')
