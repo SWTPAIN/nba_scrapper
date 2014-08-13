@@ -19,7 +19,10 @@ class Player
   field :weight, type: Integer
   field :dob, type: Date
   field :name_key, type: String
+  field :pick, type: Integer
+  field :pick_team, type: String
   embeds_many :games_stat, class_name: "GameStat"
+  embeds_many :advanced_stat, class_name: "AdvancedStat"
 end
 
 class GameStat
@@ -50,6 +53,20 @@ class GameStat
   field :plus_minus, type: Integer
   embedded_in :player 
 end
+
+class AdvancedStat
+  include Mongoid::Document
+
+  field :season, type: Integer
+  field :mp, type: Integer
+  field :per, type: Float
+  field :usg, type: Float
+  field :ortg, type: Integer
+  field :drtg, type: Integer
+  field :ws, type: Float
+  embedded_in :player 
+end
+
 
 
 get '/' do
@@ -107,9 +124,16 @@ post '/search' do
   end
 end
 
-get '/runscrapping' do
+get '/runscrappingplayerstat' do
 
   scrape_player_namelist
   redirect to('/')
 end
 
+
+get '/runscrappingplayeradvancedstat' do
+  (1983..2013).each do |year|
+    scrape_player_draft_pick(year)
+  end
+  redirect to('/')
+end

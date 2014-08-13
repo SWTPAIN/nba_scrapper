@@ -84,7 +84,6 @@ helpers do
   end
 
   def scrape_player_namelist
-
     ('a'..'z').each do |char|
       url = "http://www.basketball-reference.com/players/#{char}/"
       data = Nokogiri::HTML(open(url))
@@ -100,8 +99,61 @@ helpers do
         )
       end
     end
-    
   end
+
+  ###################################################
+
+  def scrape_player_advanced_stat(name_key)
+    url = "http://www.basketball-reference.com/players/#{name_key[0]}/#{name_key}.html"
+    data = Nokogiri::HTML(open(url))
+    advanced_stat = []
+    data.xpath("//table[@id='advanced']/tbody/tr").each do |tr|
+      advanced_stat << {
+        season: tr.css('td')[0].text()[0..3].to_i+1,
+        mp: tr.css('td')[6].text().to_i,
+        per: tr.css('td')[7].text().to_f,
+        usg: tr.css('td')[19].text().to_f,
+        ortg: tr.css('td')[20].text().to_i, 
+        drtg: tr.css('td')[21].text().to_i, 
+        ws: tr.css('td')[24].text().to_f 
+      }
+    end
+    advanced_stat
+  end
+
+
+  def scrape_player_draft_pick(year)
+    url = "http://www.basketball-reference.com/draft/NBA_#{year}.html"
+    data = Nokogiri::HTML(open(url))
+
+    data.xpath("//table[@id='stats']/tbody/tr[not(contains(@class, 'thead'))]")[0..59].each do |tr|
+      player_draft_info = {
+                full_name: tr.css('td')[3].text(),
+                pick: tr.css('td')[1].text(),
+                pick_team: tr.css('td')[2].text(),
+                name_key: tr.css('td')[3].child.attributes['href'] ? tr.css('td')[3].child.attributes['href'].value.split('/').last.sub('.html','') : nil
+              }
+      #Querying the player with the same name_key
+      if player_draft_info[:name_key] 
+        player = Player.where(name_key: player_draft_info[:name_key]).first
+        if player
+          #updating the player advanced stat
+          player.pick = player_draft_info[:pick]
+          player.pick_team = player_draft_info[:pick_team]
+          player.advanced_stat = [];
+          player.save!
+          player_advanced_stat = scrape_player_advanced_stat(player_draft_info[:name_key])
+          player_advanced_stat.each do |year_stat|
+            player.advanced_stat.push(
+              AdvancedStat.new(year_stat)
+            )
+          end 
+        end
+      end
+    end
+  end
+
+#######################################################
 
   private
 
