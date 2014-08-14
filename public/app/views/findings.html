@@ -1,5 +1,8 @@
 <div class="row search" ng-init="getData()">
-  <div class="svgWrapper">
-    <nvd3 options='options' data='atlanticData'></nvd3>
-  </div>
+    <div class="btn-group" >
+      <button ng-repeat="region in regions" ng-click="setRegion(region)" type="button" class="btn btn-default">{{region}}</button>
+    </div>
+    <div class="svgwrapper">
+    <nvd3 options='options' data='presentedData'></nvd3>
+    </div>
 </div>

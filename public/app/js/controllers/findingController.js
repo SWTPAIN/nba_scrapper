@@ -1,6 +1,6 @@
 angular.module('NbaScraper')
   .controller('FindingController', ['$scope','$http', function($scope, $http) {
-    $scope.atlanticData = [];
+    $scope.presentedData = [];
     $scope.teams = {
       atlantic: ["TOR","BRK", "NJN","BOS","NYK","PHI"],
       central: ["IND", "CHI", "CLE", "DET", "MIL"],
@@ -9,30 +9,40 @@ angular.module('NbaScraper')
       pacific: ["LAC", "GSW", "PHO", "SAC", "LAL"],
       southwest: ["SAS", "HOU", "MEM", "DAL", "NOH"]
     }
+    $scope.regions = Object.getOwnPropertyNames($scope.teams)
+    $scope.currentRegion = ""
     $scope.rawData = "";
+
+    $scope.setRegion = function(region){
+      $scope.currentRegion = region;
+      console.log($scope.currentRegion)
+    };
 
     $scope.getData = function (){
       $http.get('/advanced_data')
         .success(function(data, status){
           $scope.rawData = data;
+          $scope.currentRegion = "atlantic";
         })
         .error(function(data,status){
           $scope.notification = data ;       
         });
     };
 
-    $scope.$watch('rawData', function(newVal, oldVal){
+    $scope.$watch('currentRegion', function(newVal, oldVal){
       if( _.isEqual(oldVal, newVal) ) return;
-      for (var i=1; i<$scope.teams.atlantic.length  ; i++){
-        console.log(getPresentedData($scope.rawData, $scope.teams.atlantic[i]));
-        $scope.atlanticData.push(getPresentedData($scope.rawData, $scope.teams.atlantic[i]));
-      };
-    })
+      $scope.presentedData = []
+      for (var i=0; i<$scope.teams[newVal].length; i++){
+        $scope.presentedData.push(getPresentedData($scope.rawData, $scope.teams[newVal][i]));
+      };      
+      console.log($scope.presentedData);
+
+    });
 
     $scope.options = {
               chart: {
                   type: 'scatterChart',
-                  height: 500,
+                  height: 350,
                   color: d3.scale.category10().range(),
                   scatter: {
                       onlyCircles: false
@@ -41,17 +51,26 @@ angular.module('NbaScraper')
                   showDistY: true,
                   tooltipContent: function(key,x,y,e) {
                     var d = e.series.values[e.pointIndex];
-                    return '<h3>' + d.name + " (" +key + ")"+'</h3>';
+                    var html = '<div style="opacity: 0.5; font-size: 0.9em;">'+'<h4 style="text-align: center">' + d.name +'</h3>'
+                               + '<p>' +'Picked ' + d.pick + ' by ' + key +'</p>'
+                               + '<ul>' 
+                               + '<li>' + 'Avg Season Minute ' + Math.round(d.mp) +'</li>' 
+                               + '<li>' + 'Avg Usage Rate ' + Math.round(d.usg*10)/10 +'</li>' 
+                               + '<li>' + 'Avg Off Rate ' + Math.round(d.ortg) +'</li>' 
+                               + '<li>' + 'Avg Def Rate ' + Math.round(d.drtg) +'</li>' 
+                               + '<li>' + 'Avg Win Share ' + Math.round(d.ws*100)/100 +'</li>' 
+                               + '</ul>' 
+                               + '</div>';
+                    return html
                   },
+
+
                   transitionDuration: 350,
                   xAxis: {
                       axisLabel: 'Year',
                       tickFormat: function(d) {
                         return d3.time.format('%Y')(new Date(String(d))); 
                       }
-                      // tickFormat: function(d){
-                      //     return d3.format('.02f')(d);
-                      // }
                   },
                   yAxis: {
                       axisLabel: 'Avg Per',
@@ -63,32 +82,6 @@ angular.module('NbaScraper')
               }
           };
 
-          // $scope.data = generateData(1,40);
-
-          /* Random Data Generator (took from nvd3.org) */
-          function generateData(groups, points) {
-              var data = [],
-                  shapes = ['circle', 'cross', 'triangle-up', 'triangle-down', 'diamond', 'square'],
-                  random = d3.random.normal();
-
-              for (var i = 0; i < groups; i++) {
-                  data.push({
-                      key: 'Group ' + i,
-                      values: []
-                  });
-
-                  for (var j = 0; j < points; j++) {
-                      data[i].values.push({
-                          x: random()
-                          , y: random()
-                          , size: Math.random()
-                          , shape: shapes[j % 6]
-                      });
-                  }
-              }
-              return data;
-          }
-
           function getPresentedData(data, team){
             var presentedData = {}, 
                 shapes = {
@@ -99,7 +92,11 @@ angular.module('NbaScraper')
             presentedData.key = team;
             presentedData.values = [];
             players = _.select(data, function(player){
-              return player.pick_team == team
+              //filter out unrealisticly high or low data
+              var avg_per = getAverageStat(player, 'per')
+              if (avg_per < 45 && avg_per > -10){
+                return player.pick_team == team
+              };
             });
             for (var i=0; i<players.length; i++){
               presentedData.values.push({
@@ -107,6 +104,12 @@ angular.module('NbaScraper')
                 y: getAverageStat(players[i], 'per'),
                 size: 5- Math.log(players[i].pick), //To scale down the difference
                 name: players[i].full_name,
+                pick: players[i].pick,
+                mp: getAverageStat(players[i], 'mp'),
+                usg: getAverageStat(players[i], 'usg'),
+                ortg: getAverageStat(players[i], 'ortg'),
+                drtg: getAverageStat(players[i], 'drtg'),
+                ws: getAverageStat(players[i], 'ws'),
                 shape: shapes[players[i].position[1]]
 
               })

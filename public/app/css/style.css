@@ -51,10 +51,6 @@ font-weight: normal;
   color: rgba(21, 21, 21, 0.6);
 }
 
-.svgWrapper .btn-group{
-  /*align: center;*/
-}
-
 .blink_me {
   -webkit-animation-name: blinker;
   -webkit-animation-duration: 1s;
