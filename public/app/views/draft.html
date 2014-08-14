@@ -2,7 +2,8 @@
     <div class="btn-group" >
       <button ng-repeat="region in regions" ng-click="setRegion(region)" type="button" class="btn btn-default">{{region}}</button>
     </div>
+      <div ng-show="isProcessing" class="blink_me">Loading</div>
     <div class="svgwrapper">
-    <nvd3 options='options' data='presentedData'></nvd3>
+      <nvd3 options='options' data='presentedData'></nvd3>
     </div>
 </div>

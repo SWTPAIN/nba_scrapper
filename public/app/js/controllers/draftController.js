@@ -1,5 +1,6 @@
 angular.module('NbaScraper')
   .controller('DraftController', ['$scope','$http', function($scope, $http) {
+    $scope.isProcessing = true;
     $scope.presentedData = [];
     $scope.teams = {
       atlantic: ["TOR","BRK", "NJN","BOS","NYK","PHI"],
@@ -15,7 +16,6 @@ angular.module('NbaScraper')
 
     $scope.setRegion = function(region){
       $scope.currentRegion = region;
-      console.log($scope.currentRegion)
     };
 
     $scope.getData = function (){
@@ -23,9 +23,11 @@ angular.module('NbaScraper')
         .success(function(data, status){
           $scope.rawData = data;
           $scope.currentRegion = "atlantic";
+          $scope.isProcessing = false;
         })
         .error(function(data,status){
           $scope.notification = data ;       
+          $scope.isProcessing = false;
         });
     };
 
@@ -35,7 +37,6 @@ angular.module('NbaScraper')
       for (var i=0; i<$scope.teams[newVal].length; i++){
         $scope.presentedData.push(getPresentedData($scope.rawData, $scope.teams[newVal][i]));
       };      
-      console.log($scope.presentedData);
 
     });
 
@@ -61,7 +62,7 @@ angular.module('NbaScraper')
                                + '<li>' + 'Avg Win Share ' + Math.round(d.ws*100)/100 +'</li>' 
                                + '</ul>' 
                                + '</div>';
-                    return html
+                    return html;
                   },
                   transitionDuration: 350,
                   xAxis: {

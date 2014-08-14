@@ -77,15 +77,13 @@ angular.module('NbaScraper')
             chart: {
               type: 'scatterChart',
               height: 350,
-              margin : {
+              margin: {
                   top: 20,
                   right: 20,
                   bottom: 40,
                   left: 55
               },
-              x: function(d){ return d.x; },
-              y: function(d){ return d.y; },
-              useInteractiveGuideline: true,
+              color: d3.scale.category10().range(),
               xAxis: {
                   axisLabel: 'Age',
                   tickFormat: function(d){
@@ -99,8 +97,7 @@ angular.module('NbaScraper')
                   },
                   axisLabelDistance: 30
               },
-              transitionDuration: 500,
-              interpolate: 'linear'
+              transitionDuration: 350
             },
             title: {
               enable: true,
@@ -157,18 +154,7 @@ angular.module('NbaScraper')
 
     return {
         values: totalYears,
-        key: player_stat.full_name,
-        color: getRandomColor()
+        key: player_stat.full_name
     }
   };
-
-  function getRandomColor(){
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#'
-    for (var i=0; i<6; i++){
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
 }]);

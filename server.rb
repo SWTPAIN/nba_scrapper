@@ -76,9 +76,9 @@ end
 
 get '/advanced_data' do
   content_type :json
-  drafted_players = Player.where(:pick.gte => 0, :drafted_year.gte => 1974)
+  drafted_players = Player.without(:games_stat).where(:pick.gte => 0, :drafted_year.gte => 1974)
   status 200
-  body(drafted_players.to_json(except: [:_id, :games_stat]))
+  body(drafted_players.to_json(except: [:_id]))
 end
 
 
@@ -86,9 +86,9 @@ post '/scrape' do
   content_type :json
   ng_params = env['rack.input'].gets #request.body.read
   # check if the player already exist in the database
-  player = Player.where(name_key: ng_params).first
+  player = Player.without(:drafted_year, :pick, :pick_team, :advanced_stat).where(name_key: ng_params).first
   unless player.games_stat.empty?
-    body( player.to_json(except: [:_id, :drafted_year, :pick, :pick_team, :advanced_stat]))
+    body( player.to_json(except: [:_id]))
   else
     begin
       player_games_stat = scrapping_player_stat(ng_params)
