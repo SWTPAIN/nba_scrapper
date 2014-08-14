@@ -10,8 +10,15 @@
   </head>
   <body >
     <div class="header">
-      <h1 class="header-title">NBA Scraper</h1>
-      <p class="header-desctiption">Simple app to scrape NBA data</p>
+      <div class="header-title">
+        <a href="#/">NBA Scraper</a>
+      </div> 
+      <p class="header-desctiption">Simple app to scrape NBA data and visualize them</p>
+    </div>
+    <div class="nav">
+        <ul class="nav-inner ">
+          <li><a href="#/draft">Draft Pick vs Performance</a></li>
+        </ul>
     </div>
     <div class='container' ng-view></div>
 
@@ -20,12 +27,14 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
     <script src="//code.angularjs.org/1.2.20/angular-animate.min.js" ></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-animate.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.1.5/d3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/nvd3/1.1.15-beta/nv.d3.min.js"></script>
     <script src="/vendor/js/angularjs-nvd3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angularjs-toaster/0.4.4/toaster.js"></script>
     <script src="/app/app.js"></script>
     <script src="/app/js/controllers/playerController.js"></script>
+    <script src="/app/js/controllers/draftController.js"></script>
     <script src="/app/js/services/playerStat.js"></script>
   </body>
 </html>

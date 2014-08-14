@@ -1,9 +1,15 @@
 angular.module('NbaScraper')
-  .factory('playerStat', ['$http', function($http){
+  .factory('PlayerStat', function($http) {
     return {
-      searchPlayerStat: function(player, callback){
-        $http.post('/search', { "data":  player })
-          .success(callback);
+      searchPlayer: function(playerName, successCallback, errorCallback) {
+        $http.post('/search', playerName)
+          .success(successCallback)
+          .error(errorCallback);
+      },
+      scrapePlayer: function(name_key, successCallback, errorCallback) {
+        $http.post('/scrape', name_key)
+          .success(successCallback)
+          .error(errorCallback);
       }
-    }
-  }])
+    };
+});
