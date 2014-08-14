@@ -60,7 +60,7 @@ def scrapping_player_stat(name_key)
 end
 
 def scrape_player_namelist
-  ('b'..'b').each do |char|
+  ('a'..'z').each do |char|
     puts "Scraping player with last name starting with #{char}"
     url = "http://www.basketball-reference.com/players/#{char}/"
     data = Nokogiri::HTML(open(url))
