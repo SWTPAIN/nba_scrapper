@@ -1,5 +1,5 @@
 angular.module('NbaScraper')
-  .controller('FindingController', ['$scope','$http', function($scope, $http) {
+  .controller('DraftController', ['$scope','$http', function($scope, $http) {
     $scope.presentedData = [];
     $scope.teams = {
       atlantic: ["TOR","BRK", "NJN","BOS","NYK","PHI"],
@@ -51,7 +51,7 @@ angular.module('NbaScraper')
                   showDistY: true,
                   tooltipContent: function(key,x,y,e) {
                     var d = e.series.values[e.pointIndex];
-                    var html = '<div style="opacity: 0.5; font-size: 0.9em;">'+'<h4 style="text-align: center">' + d.name +'</h3>'
+                    var html = '<div style="opacity: 0.5; font-size: 0.9em;">'+'<h4 style="text-align: center">' + d.name + '(' + d.pos + ')' + '</h3>'
                                + '<p>' +'Picked ' + d.pick + ' by ' + key +'</p>'
                                + '<ul>' 
                                + '<li>' + 'Avg Season Minute ' + Math.round(d.mp) +'</li>' 
@@ -63,8 +63,6 @@ angular.module('NbaScraper')
                                + '</div>';
                     return html
                   },
-
-
                   transitionDuration: 350,
                   xAxis: {
                       axisLabel: 'Year',
@@ -79,6 +77,21 @@ angular.module('NbaScraper')
                       },
                       axisLabelDistance: 30
                   }
+              },
+              title: {
+                enable: true,
+                text: 'Draft Pick vs Perfomance'
+              },
+              caption: {
+                enable: true,
+                html: "<p>The larger a scatter point, the earlier the player's pick is.</p>"
+                  +'<b>Reference:</b> http://www.basketball-reference.com<br/>' 
+                  + '<p>Have an idea for exploring data? Send me a email! kafaicoder@gmail.com<p>',
+                css: {
+                  'text-align': 'justify',
+                  'text-font': '10px',
+                  'margin': '10px 13px 0px 7px'
+                }
               }
           };
 
@@ -105,13 +118,13 @@ angular.module('NbaScraper')
                 size: 5- Math.log(players[i].pick), //To scale down the difference
                 name: players[i].full_name,
                 pick: players[i].pick,
+                pos: players[i].position,
                 mp: getAverageStat(players[i], 'mp'),
                 usg: getAverageStat(players[i], 'usg'),
                 ortg: getAverageStat(players[i], 'ortg'),
                 drtg: getAverageStat(players[i], 'drtg'),
                 ws: getAverageStat(players[i], 'ws'),
                 shape: shapes[players[i].position[1]]
-
               })
             };
             return presentedData;

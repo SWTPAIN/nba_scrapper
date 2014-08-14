@@ -5,9 +5,9 @@ angular.module('NbaScraper', ['ngRoute', 'ngAnimate', 'nvd3', 'toaster'])
         templateUrl: 'app/views/main.html',
         controller: 'PlayerController'
       })
-      .when('/findings', {
-        templateUrl: 'app/views/findings.html',
-        controller: 'FindingController'
+      .when('/draft', {
+        templateUrl: 'app/views/draft.html',
+        controller: 'DraftController'
       })
       .otherwise({
         redirectTo: '/'

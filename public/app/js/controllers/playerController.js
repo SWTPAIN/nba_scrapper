@@ -22,6 +22,7 @@ angular.module('NbaScraper')
     };
 
     $scope.searchPlayer = function(playerName){
+      $scope.isProcessing = true;      
       PlayerStat.searchPlayer(playerName, function(data,status){
         $scope.player_namelist = data;
         $scope.isProcessing = false;      
