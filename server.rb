@@ -132,17 +132,3 @@ post '/search' do
     body("There is some problem in the server. Please try it again.")    
   end
 end
-
-get '/runscrappingplayerstat' do
-
-  scrape_player_namelist
-  redirect to('/')
-end
-
-
-get '/runscrappingplayeradvancedstat' do
-  (1974..2013).each do |year|
-    scrape_player_draft_pick(year)
-  end
-  redirect to('/')
-end
