@@ -19,7 +19,7 @@ namespace :db do
     end
     puts 'Scraping data done'
     #prevent rake from attempting to invoke a task for each command line argument.
+    task ARGV[1] do ; end
     task ARGV[2] do ; end
-    task ARGV[3] do ; end
   end
 end

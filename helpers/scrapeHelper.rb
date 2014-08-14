@@ -59,35 +59,15 @@ def scrapping_player_stat(name_key)
   games_stat
 end
 
-def scrapping_player_namelist(player_name)
-
-  search_term = player_name.strip.gsub(' ','+')
-
-  url = "http://www.basketball-reference.com/player_search.cgi?search=#{search_term}"
-  data = Nokogiri::HTML(open(url))
-
-  if data.xpath("/html/body/div[1]/div[3]/table").empty?
-    puts "Could not found this player (#{player_name})."
-    raise "Could not found this player (#{player_name})."
-  else 
-    search_result = data.xpath("/html/body/div[1]/div[3]/table/tr")[0..10].map do |tr|
-      {
-        player_name: tr.css('td')[0].text(),
-        player_info: tr.css('td')[3].text() + ' ' + tr.css('td')[4].text()
-      }
-    end
-  end
-  search_result
-
-end
-
 def scrape_player_namelist
-  ('a'..'z').each do |char|
+  ('b'..'b').each do |char|
+    puts "Scraping player with last name starting with #{char}"
     url = "http://www.basketball-reference.com/players/#{char}/"
     data = Nokogiri::HTML(open(url))
 
     data.xpath("//div[@id='div_players']/table/tbody/tr").each do |tr|
-      Player.create!(
+      career_duration = tr.css('td')[2].text().to_i - tr.css('td')[1].text().to_i
+      player = Player.create!(
         full_name: tr.css('td')[0].text(),
         position: tr.css('td')[3].text().split('-'),
         height: inches_to_cm(tr.css('td')[4].text()),
@@ -95,6 +75,15 @@ def scrape_player_namelist
         dob: tr.css('td')[6].text(),
         name_key: parse_name_key(tr)
       )
+      #persist gamestat for player having long career duration
+      if (career_duration > 12)
+        player_games_stat = scrapping_player_stat(player[:name_key])
+        player_games_stat.each do |game_stat|
+          player.games_stat.push(
+            GameStat.new(game_stat)
+          ) 
+        end
+      end
     end
   end
 end
@@ -191,4 +180,3 @@ def parse_age(age)
   year, days = age.split('-')
   (year.to_i + days.gsub(/^[0]+/,'').to_i/365.0).round(3)
 end
-
