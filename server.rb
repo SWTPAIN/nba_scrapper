@@ -76,7 +76,7 @@ end
 
 get '/advanced_data' do
   content_type :json
-  drafted_players = Player.where(:pick.gte => 0, :drafted_year.gte => 2004)
+  drafted_players = Player.where(:pick.gte => 0, :drafted_year.gte => 1974)
   status 200
   body(drafted_players.to_json(except: [:_id, :games_stat]))
 end
