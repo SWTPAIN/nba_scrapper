@@ -1,5 +1,5 @@
 angular.module('NbaScraper')
-  .controller('PlayerController', ['$scope', '$rootScope', '$http', 'toaster', function($scope, $rootScope, $http ,toaster){
+  .controller('PlayerController', ['$scope', '$rootScope', '$http', 'toaster', 'PlayerStat', function($scope, $rootScope, $http ,toaster, PlayerStat){
     $scope.playerName = "";
     $scope.playerData = {};
     $scope.totalData = [];
@@ -19,65 +19,59 @@ angular.module('NbaScraper')
 
     $scope.setStatType = function(type){
       $scope.currentStatType = type;
-    }
-
+    };
 
     $scope.searchPlayer = function(playerName){
-      $scope.isProcessing = true;
-      $http.post('/search', playerName)
-        .success(function(data, status){
-          console.log(data);
-          $scope.player_namelist = data;
-          $scope.isProcessing = false;
-        })
-        .error(function(data, status){
+      PlayerStat.searchPlayer(playerName, function(data,status){
+        $scope.player_namelist = data;
+        $scope.isProcessing = false;      
+        },
+        function(data,status){
           $scope.isProcessing = false;
           $scope.notification = data
-        });
+      });
     };
 
     $scope.scrapePlayer = function(name_key){
       if (name_key == null || $scope.isProcessing) return;
       $scope.isProcessing = true;
-      $http.post('/scrape', name_key)
-        .success(function(data, status){
-          $scope.playerData = data;
-          $scope.isProcessing = false;
-        })
-        .error(function(data, status){
+      PlayerStat.scrapePlayer(name_key, function(data,status){
+        $scope.playerData = data;
+        $scope.isProcessing = false;     
+        },
+        function(data,status){
           $scope.isProcessing = false;
           $scope.notification = data
-        });
+      });
     };
 
   $scope.$watch('playerData', function(newVal, oldVal){
     if( _.isEqual(oldVal, newVal) ) return;
     $scope.totalData.push(newVal);
     $scope.presentedData.push(toAnotherType(newVal, $scope.currentStatType.shortName))
-  })
+  });
 
   $scope.$watch('currentStatType', function(newVal, oldVal){
     if( _.isEqual(oldVal, newVal) ) return;
     $scope.presentedData = getPresentedData($scope.totalData, $scope.currentStatType.shortName)
     $scope.options = generateOptions();
-  })
+  });
 
   $scope.$watch('totalData', function(newVal, oldVal){
     if( _.isEqual(oldVal, newVal) ) return;
     $scope.totalData.push(newVal);   
-  })
+  });
+
   $scope.$watch('notification', function(newVal, oldVal){
     if(oldVal == newVal) return;
     $scope.pop();
-  })  
+  });
 
   $scope.pop = function(){
     toaster.pop('error', "Error", $scope.notification, 6000);
   };
 
-
   function generateOptions(){
-
     return {
             chart: {
               type: 'scatterChart',
@@ -129,7 +123,7 @@ angular.module('NbaScraper')
               }
             }
            };
-  }
+  };
 
   function getPresentedData(data, type){
     var output_data = [];
@@ -174,6 +168,6 @@ angular.module('NbaScraper')
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  }
+  };
 
 }]);
